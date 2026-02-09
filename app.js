@@ -8,8 +8,8 @@ const YAHOO_BASE_URL = 'https://query1.finance.yahoo.com/v8/finance/chart/';
 // Format: US stocks = ticker, German stocks = ticker.DE, etc.
 const WKN_TO_TICKER = {
     // Tjark's stocks
-    'A4AFDY': 'BTC-EUR',       // Bitcoin ETP (adjust if different)
-    'PG0Q56': 'BTC-EUR',       // Crypto (adjust if different)
+    'A4AFDY': '21XB.DE',       // 21Shares Bitcoin Core ETP
+    'PG0Q56': 'WBIT.DE',       // WisdomTree Bitcoin
     'GJ860K': null,            // Derivative/Warrant - manual only
     'GV3XWF': null,            // Derivative/Warrant - manual only
     'A14Y6F': 'SHOP',          // Shopify
@@ -17,82 +17,82 @@ const WKN_TO_TICKER = {
     'A1KWPQ': 'V',             // Visa
     'A2T0VU': 'CRWD',          // CrowdStrike
     'A2AT0H': 'SNAP',          // Snap Inc
-    '871970': 'TUI1.DE',       // TUI AG (German)
+    '871970': 'TUI1.DE',       // TUI AG
     'A143D6': 'ETSY',          // Etsy
     'A3DQXS': 'SNOW',          // Snowflake
     'A3C4QT': 'PLTR',          // Palantir
-    '602224': 'HEN3.DE',       // Henkel (German)
+    '602224': 'IPGP',          // IPG Photonics
     'A3C7R6': 'DDOG',          // Datadog
     'A12B6J': 'PYPL',          // PayPal
     '908063': 'NKE',           // Nike
     'A41FLM': 'IONQ',          // IonQ
     'A3EU6F': 'NET',           // Cloudflare
-    'PAG911': 'PAG',           // Penske Automotive
+    'PAG911': 'P911.DE',       // Porsche AG Vz
     'A3C47B': 'SOFI',          // SoFi Technologies
     
     // Matthias's stocks
-    'A0F5DE': 'KGH.WA',        // KGHM Polska Miedz (Warsaw)
+    'A0F5DE': 'AMA.DE',        // Altech Advanced Materials
     'A2JG9Z': 'MELI',          // MercadoLibre
-    'A0M4W9': 'EEM',           // iShares Emerging Markets ETF
-    '694482': 'SIE.DE',        // Siemens (German)
-    '851399': 'MCD',           // McDonald's
-    '936793': 'JNJ',           // Johnson & Johnson
-    'A1H5UP': 'UBER',          // Uber
-    'A0YERL': 'GILD',          // Gilead Sciences
-    'A14WK0': 'ADBE',          // Adobe
-    'A0ETBQ': 'ASML',          // ASML
-    'A2N5NR': 'VWO',           // Vanguard Emerging Markets ETF
-    'A0DLEV': 'IWM',           // iShares Russell 2000 ETF
-    'A4009U': 'RIVN',          // Rivian
-    'A2JNY1': 'NIO',           // NIO
-    'A2QBX7': 'CPNG',          // Coupang
-    'DBX1DA': 'XDWD.DE',       // Xtrackers MSCI World (German ETF)
-    'DBX0SV': 'XDWL.DE',       // Xtrackers MSCI World (German ETF)
+    'A0M4W9': 'S2F.DE',        // Sandfire Resources
+    '694482': 'HDB',           // HDFC Bank
+    '851399': 'IBM',           // IBM
+    '936793': 'IBN',           // ICICI Bank
+    'A1H5UP': 'IQP4.DE',       // iShares MSCI Poland
+    'A0YERL': 'LEA',           // Lear Corp
+    'A14WK0': 'LITE',          // Lumentum
+    'A0ETBQ': 'MBB.DE',        // MBB SE
+    'A2N5NR': '22UA.DE',       // BioNTech
+    'A0DLEV': 'BC8.DE',        // Bechtle
+    'A4009U': '9880.HK',       // Ubtech Robotics (HK)
+    'A2JNY1': '3CP.DE',        // Xiaomi (German ticker)
+    'A2QBX7': 'XPEV',          // XPeng
+    'DBX1DA': 'DBX1.DE',       // Xtrackers DAX
+    'DBX0SV': 'DBXW.DE',       // Xtrackers MSCI World Swap
 };
 
 // Initial data from the CSV (pre-populated)
 const initialStocks = [
     // Tjark's stocks
-    { id: 1, owner: 'tjark', wkn: 'A4AfDY', name: '', amount: 102.06, buyPrice: 31.65, currentPrice: 31.65, category: 'growth', sector: 'technology' },
-    { id: 2, owner: 'tjark', wkn: 'PG0Q56', name: '', amount: 344, buyPrice: 0.29, currentPrice: 0.29, category: 'growth', sector: 'crypto' },
-    { id: 3, owner: 'tjark', wkn: 'GJ860K', name: '', amount: 30, buyPrice: 1.63, currentPrice: 1.63, category: 'growth', sector: 'other' },
-    { id: 4, owner: 'tjark', wkn: 'GV3XwF', name: '', amount: 235, buyPrice: 0.21, currentPrice: 0.21, category: 'growth', sector: 'other' },
+    { id: 1, owner: 'tjark', wkn: 'A4AfDY', name: '21Shares Bitcoin Core ETP', amount: 102.06, buyPrice: 31.65, currentPrice: 31.65, category: 'growth', sector: 'crypto' },
+    { id: 2, owner: 'tjark', wkn: 'PG0Q56', name: 'WisdomTree Bitcoin', amount: 344, buyPrice: 0.29, currentPrice: 0.29, category: 'growth', sector: 'crypto' },
+    { id: 3, owner: 'tjark', wkn: 'GJ860K', name: 'Warrant/Derivative', amount: 30, buyPrice: 1.63, currentPrice: 1.63, category: 'growth', sector: 'other' },
+    { id: 4, owner: 'tjark', wkn: 'GV3XwF', name: 'Warrant/Derivative', amount: 235, buyPrice: 0.21, currentPrice: 0.21, category: 'growth', sector: 'other' },
     { id: 5, owner: 'tjark', wkn: 'A14Y6F', name: 'Shopify Inc.', amount: 3, buyPrice: 169.04, currentPrice: 169.04, category: 'value', sector: 'technology' },
     { id: 6, owner: 'tjark', wkn: 'A0YJQ2', name: 'Intuitive Surgical Inc.', amount: 3, buyPrice: 409.70, currentPrice: 409.70, category: 'growth', sector: 'technology' },
     { id: 7, owner: 'tjark', wkn: 'A1KWPQ', name: 'VISA Inc.', amount: 8, buyPrice: 55.41, currentPrice: 55.41, category: 'value', sector: 'finance' },
     { id: 8, owner: 'tjark', wkn: 'A2T0VU', name: 'CrowdStrike Holdings, Inc.', amount: 6, buyPrice: 54.20, currentPrice: 54.20, category: 'growth', sector: 'technology' },
     { id: 9, owner: 'tjark', wkn: 'A2AT0H', name: 'Snap Inc.', amount: 2, buyPrice: 18.00, currentPrice: 18.00, category: 'value', sector: 'consumer' },
-    { id: 10, owner: 'tjark', wkn: '871970', name: '', amount: 30, buyPrice: 1.64, currentPrice: 1.64, category: 'value', sector: 'industrial' },
+    { id: 10, owner: 'tjark', wkn: '871970', name: 'TUI AG', amount: 30, buyPrice: 1.64, currentPrice: 1.64, category: 'value', sector: 'industrial' },
     { id: 11, owner: 'tjark', wkn: 'A143D6', name: 'Etsy, Inc.', amount: 1, buyPrice: 55.00, currentPrice: 55.00, category: 'growth', sector: 'technology' },
     { id: 12, owner: 'tjark', wkn: 'A3DQXS', name: 'Snowflake Inc.', amount: 1, buyPrice: 167.50, currentPrice: 167.50, category: 'growth', sector: 'technology' },
     { id: 13, owner: 'tjark', wkn: 'A3C4QT', name: 'Palantir Technologies Inc.', amount: 1, buyPrice: 40.20, currentPrice: 40.20, category: 'growth', sector: 'technology' },
-    { id: 14, owner: 'tjark', wkn: '602224', name: '', amount: 1, buyPrice: 77.12, currentPrice: 77.12, category: 'value', sector: 'consumer' },
+    { id: 14, owner: 'tjark', wkn: '602224', name: 'IPG Photonics', amount: 1, buyPrice: 77.12, currentPrice: 77.12, category: 'value', sector: 'technology' },
     { id: 15, owner: 'tjark', wkn: 'A3C7R6', name: 'Datadog, Inc.', amount: 1, buyPrice: 46.85, currentPrice: 46.85, category: 'growth', sector: 'technology' },
     { id: 16, owner: 'tjark', wkn: 'A12B6J', name: 'PayPal Holdings, Inc.', amount: 1, buyPrice: 180.14, currentPrice: 180.14, category: 'growth', sector: 'finance' },
     { id: 17, owner: 'tjark', wkn: '908063', name: 'Nike, Inc.', amount: 6, buyPrice: 77.42, currentPrice: 77.42, category: 'value', sector: 'consumer' },
     { id: 18, owner: 'tjark', wkn: 'A41FLM', name: 'IonQ, Inc.', amount: 5, buyPrice: 9.35, currentPrice: 9.35, category: 'growth', sector: 'technology' },
     { id: 19, owner: 'tjark', wkn: 'A3EU6F', name: 'Cloudflare, Inc.', amount: 1, buyPrice: 53.19, currentPrice: 53.19, category: 'growth', sector: 'technology' },
-    { id: 20, owner: 'tjark', wkn: 'PAG911', name: 'Penske Automotive Group, Inc.', amount: 1, buyPrice: 42.43, currentPrice: 42.43, category: 'value', sector: 'industrial' },
+    { id: 20, owner: 'tjark', wkn: 'PAG911', name: 'Porsche AG', amount: 1, buyPrice: 42.43, currentPrice: 42.43, category: 'value', sector: 'industrial' },
     { id: 21, owner: 'tjark', wkn: 'A3C47B', name: 'SoFi Technologies, Inc.', amount: 3, buyPrice: 13.36, currentPrice: 13.36, category: 'growth', sector: 'technology' },
     
     // Matthias's stocks
-    { id: 22, owner: 'matthias', wkn: 'A0F5DE', name: 'KGHM Polska Miedz', amount: 2, buyPrice: 119.80, currentPrice: 119.80, category: 'value', sector: 'materials' },
+    { id: 22, owner: 'matthias', wkn: 'A0F5DE', name: 'Altech Advanced Materials', amount: 2, buyPrice: 119.80, currentPrice: 119.80, category: 'value', sector: 'materials' },
     { id: 23, owner: 'matthias', wkn: 'A2JG9Z', name: 'Mercado Libre, Inc.', amount: 4, buyPrice: 280.00, currentPrice: 280.00, category: 'growth', sector: 'technology' },
-    { id: 24, owner: 'matthias', wkn: 'A0M4W9', name: 'iShares MSCI Emerging Markets ETF', amount: 26, buyPrice: 9.71, currentPrice: 9.71, category: 'value', sector: 'etf' },
-    { id: 25, owner: 'matthias', wkn: '694482', name: '', amount: 9, buyPrice: 28.60, currentPrice: 28.60, category: 'value', sector: 'industrial' },
-    { id: 26, owner: 'matthias', wkn: '851399', name: "McDonald's Corporation", amount: 4, buyPrice: 250.00, currentPrice: 250.00, category: 'value', sector: 'consumer' },
-    { id: 27, owner: 'matthias', wkn: '936793', name: 'Johnson & Johnson', amount: 10, buyPrice: 26.10, currentPrice: 26.10, category: 'value', sector: 'healthcare' },
-    { id: 28, owner: 'matthias', wkn: 'A1H5UP', name: 'Uber Technologies, Inc.', amount: 8, buyPrice: 30.56, currentPrice: 30.56, category: 'growth', sector: 'technology' },
-    { id: 29, owner: 'matthias', wkn: 'A0YERL', name: 'Gilead Sciences Inc.', amount: 3, buyPrice: 101.00, currentPrice: 101.00, category: 'value', sector: 'healthcare' },
-    { id: 30, owner: 'matthias', wkn: 'A14WK0', name: 'Adobe Inc.', amount: 1, buyPrice: 374.30, currentPrice: 374.30, category: 'growth', sector: 'technology' },
-    { id: 31, owner: 'matthias', wkn: 'A0ETBQ', name: 'ASML Holding NV', amount: 10, buyPrice: 216.75, currentPrice: 216.75, category: 'growth', sector: 'technology' },
-    { id: 32, owner: 'matthias', wkn: 'A2N5NR', name: 'Vanguard FTSE Emerging Markets ETF', amount: 25, buyPrice: 10.08, currentPrice: 10.08, category: 'value', sector: 'etf' },
-    { id: 33, owner: 'matthias', wkn: 'A0DLEV', name: 'iShares Russell 2000 ETF', amount: 11, buyPrice: 23.26, currentPrice: 23.26, category: 'value', sector: 'etf' },
-    { id: 34, owner: 'matthias', wkn: 'A4009U', name: 'Rivian Automotive, Inc.', amount: 18, buyPrice: 14.70, currentPrice: 14.70, category: 'growth', sector: 'technology' },
-    { id: 35, owner: 'matthias', wkn: 'A2JNY1', name: 'NIO Inc.', amount: 67, buyPrice: 3.75, currentPrice: 3.75, category: 'growth', sector: 'other' },
-    { id: 36, owner: 'matthias', wkn: 'A2QBX7', name: 'Coupang, Inc.', amount: 18, buyPrice: 14.25, currentPrice: 14.25, category: 'growth', sector: 'technology' },
-    { id: 37, owner: 'matthias', wkn: 'DBX1DA', name: 'SPDR S&P 500 ETF Trust', amount: 8, buyPrice: 232.70, currentPrice: 232.70, category: 'value', sector: 'etf' },
-    { id: 38, owner: 'matthias', wkn: 'DBX0SV', name: 'Vanguard Total Stock Market ETF', amount: 707, buyPrice: 11.29, currentPrice: 11.29, category: 'value', sector: 'etf' },
+    { id: 24, owner: 'matthias', wkn: 'A0M4W9', name: 'Sandfire Resources', amount: 26, buyPrice: 9.71, currentPrice: 9.71, category: 'value', sector: 'materials' },
+    { id: 25, owner: 'matthias', wkn: '694482', name: 'HDFC Bank', amount: 9, buyPrice: 28.60, currentPrice: 28.60, category: 'value', sector: 'finance' },
+    { id: 26, owner: 'matthias', wkn: '851399', name: "IBM", amount: 4, buyPrice: 250.00, currentPrice: 250.00, category: 'value', sector: 'technology' },
+    { id: 27, owner: 'matthias', wkn: '936793', name: 'ICICI Bank', amount: 10, buyPrice: 26.10, currentPrice: 26.10, category: 'value', sector: 'finance' },
+    { id: 28, owner: 'matthias', wkn: 'A1H5UP', name: 'iShares MSCI Poland', amount: 8, buyPrice: 30.56, currentPrice: 30.56, category: 'growth', sector: 'etf' },
+    { id: 29, owner: 'matthias', wkn: 'A0YERL', name: 'Lear Corp', amount: 3, buyPrice: 101.00, currentPrice: 101.00, category: 'value', sector: 'consumer' },
+    { id: 30, owner: 'matthias', wkn: 'A14WK0', name: 'Lumentum', amount: 1, buyPrice: 374.30, currentPrice: 374.30, category: 'growth', sector: 'technology' },
+    { id: 31, owner: 'matthias', wkn: 'A0ETBQ', name: 'MBB SE', amount: 10, buyPrice: 216.75, currentPrice: 216.75, category: 'growth', sector: 'industrial' },
+    { id: 32, owner: 'matthias', wkn: 'A2N5NR', name: 'BioNTech SE', amount: 25, buyPrice: 10.08, currentPrice: 10.08, category: 'value', sector: 'healthcare' },
+    { id: 33, owner: 'matthias', wkn: 'A0DLEV', name: 'Bechtle AG', amount: 11, buyPrice: 23.26, currentPrice: 23.26, category: 'value', sector: 'technology' },
+    { id: 34, owner: 'matthias', wkn: 'A4009U', name: 'Ubtech Robotics', amount: 18, buyPrice: 14.70, currentPrice: 14.70, category: 'growth', sector: 'technology' },
+    { id: 35, owner: 'matthias', wkn: 'A2JNY1', name: 'Xiaomi', amount: 67, buyPrice: 3.75, currentPrice: 3.75, category: 'growth', sector: 'technology' },
+    { id: 36, owner: 'matthias', wkn: 'A2QBX7', name: 'XPeng', amount: 18, buyPrice: 14.25, currentPrice: 14.25, category: 'growth', sector: 'consumer' },
+    { id: 37, owner: 'matthias', wkn: 'DBX1DA', name: 'Xtrackers DAX', amount: 8, buyPrice: 232.70, currentPrice: 232.70, category: 'value', sector: 'etf' },
+    { id: 38, owner: 'matthias', wkn: 'DBX0SV', name: 'Xtrackers MSCI World Swap', amount: 707, buyPrice: 11.29, currentPrice: 11.29, category: 'value', sector: 'etf' },
 ];
 
 // State management

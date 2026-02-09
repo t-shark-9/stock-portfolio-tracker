@@ -5,11 +5,12 @@ const YAHOO_PROXY = 'https://corsproxy.io/?';
 const YAHOO_BASE_URL = 'https://query1.finance.yahoo.com/v8/finance/chart/';
 
 // WKN to Yahoo Finance Ticker mapping
+// WKN to Yahoo Finance Ticker mapping
 // Format: US stocks = ticker, German stocks = ticker.DE, etc.
 const WKN_TO_TICKER = {
     // Tjark's stocks
-    'A4AFDY': '21XB.DE',       // 21Shares Bitcoin Core ETP
-    'PG0Q56': 'WBIT.DE',       // WisdomTree Bitcoin
+    'A4AFDY': 'CBTC.DE',       // 21Shares Bitcoin Core ETP
+    'PG0Q56': 'WBIT.DE',       // WisdomTree Bitcoin (WKN might be A3GK2N)
     'GJ860K': null,            // Derivative/Warrant - manual only
     'GV3XWF': null,            // Derivative/Warrant - manual only
     'A14Y6F': 'SHOP',          // Shopify
@@ -43,18 +44,18 @@ const WKN_TO_TICKER = {
     'A0ETBQ': 'MBB.DE',        // MBB SE
     'A2N5NR': '22UA.DE',       // BioNTech
     'A0DLEV': 'BC8.DE',        // Bechtle
-    'A4009U': '9880.HK',       // Ubtech Robotics (HK)
+    'A4009U': 'UBTRF',         // Ubtech Robotics (OTC)
     'A2JNY1': '3CP.DE',        // Xiaomi (German ticker)
     'A2QBX7': 'XPEV',          // XPeng
     'DBX1DA': 'DBX1.DE',       // Xtrackers DAX
-    'DBX0SV': 'DBXW.DE',       // Xtrackers MSCI World Swap
+    'DBX0SV': 'XDPU.DE',       // Xtrackers S&P 500 Swap
 };
 
 // Initial data from the CSV (pre-populated)
 const initialStocks = [
     // Tjark's stocks
     { id: 1, owner: 'tjark', wkn: 'A4AfDY', name: '21Shares Bitcoin Core ETP', amount: 102.06, buyPrice: 31.65, currentPrice: 31.65, category: 'growth', sector: 'crypto' },
-    { id: 2, owner: 'tjark', wkn: 'PG0Q56', name: 'WisdomTree Bitcoin', amount: 344, buyPrice: 0.29, currentPrice: 0.29, category: 'growth', sector: 'crypto' },
+    { id: 2, owner: 'tjark', wkn: 'PG0Q56', name: 'WisdomTree Bitcoin (Check WKN)', amount: 344, buyPrice: 0.29, currentPrice: 0.29, category: 'growth', sector: 'crypto' },
     { id: 3, owner: 'tjark', wkn: 'GJ860K', name: 'Warrant/Derivative', amount: 30, buyPrice: 1.63, currentPrice: 1.63, category: 'growth', sector: 'other' },
     { id: 4, owner: 'tjark', wkn: 'GV3XwF', name: 'Warrant/Derivative', amount: 235, buyPrice: 0.21, currentPrice: 0.21, category: 'growth', sector: 'other' },
     { id: 5, owner: 'tjark', wkn: 'A14Y6F', name: 'Shopify Inc.', amount: 3, buyPrice: 169.04, currentPrice: 169.04, category: 'value', sector: 'technology' },
@@ -92,7 +93,7 @@ const initialStocks = [
     { id: 35, owner: 'matthias', wkn: 'A2JNY1', name: 'Xiaomi', amount: 67, buyPrice: 3.75, currentPrice: 3.75, category: 'growth', sector: 'technology' },
     { id: 36, owner: 'matthias', wkn: 'A2QBX7', name: 'XPeng', amount: 18, buyPrice: 14.25, currentPrice: 14.25, category: 'growth', sector: 'consumer' },
     { id: 37, owner: 'matthias', wkn: 'DBX1DA', name: 'Xtrackers DAX', amount: 8, buyPrice: 232.70, currentPrice: 232.70, category: 'value', sector: 'etf' },
-    { id: 38, owner: 'matthias', wkn: 'DBX0SV', name: 'Xtrackers MSCI World Swap', amount: 707, buyPrice: 11.29, currentPrice: 11.29, category: 'value', sector: 'etf' },
+    { id: 38, owner: 'matthias', wkn: 'DBX0SV', name: 'Xtrackers S&P 500', amount: 707, buyPrice: 11.29, currentPrice: 11.29, category: 'value', sector: 'etf' },
 ];
 
 // State management

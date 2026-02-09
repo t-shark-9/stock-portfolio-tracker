@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Portfolio Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📈 Stock Portfolio Tracker</h1>
+            <p class="last-update">Last updated: <span id="lastUpdate">-</span></p>
+            <button id="refreshPrices" class="btn btn-primary">🔄 Refresh Prices</button>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="summary-section">
+            <div class="summary-card tjark-card">
+                <h3>Tjark's Portfolio</h3>
+                <div class="summary-value" id="tjarkTotal">€0.00</div>
+                <div class="summary-gain" id="tjarkGain">+€0.00 (0%)</div>
+            </div>
+            <div class="summary-card matthias-card">
+                <h3>Matthias' Portfolio</h3>
+                <div class="summary-value" id="matthiasTotal">€0.00</div>
+                <div class="summary-gain" id="matthiasGain">+€0.00 (0%)</div>
+            </div>
+            <div class="summary-card total-card">
+                <h3>Combined Total</h3>
+                <div class="summary-value" id="combinedTotal">€0.00</div>
+                <div class="summary-gain" id="combinedGain">+€0.00 (0%)</div>
+            </div>
+        </div>
+
+        <!-- Filter and Add Section -->
+        <div class="controls-section">
+            <div class="filters">
+                <label>Owner:
+                    <select id="filterOwner">
+                        <option value="all">All</option>
+                        <option value="tjark">Tjark</option>
+                        <option value="matthias">Matthias</option>
+                    </select>
+                </label>
+                <label>Category:
+                    <select id="filterCategory">
+                        <option value="all">All</option>
+                        <option value="value">Value</option>
+                        <option value="growth">Growth</option>
+                    </select>
+                </label>
+                <label>Sector:
+                    <select id="filterSector">
+                        <option value="all">All</option>
+                    </select>
+                </label>
+            </div>
+            <button id="addStockBtn" class="btn btn-success">+ Add Investment</button>
+        </div>
+
+        <!-- Tabs for different views -->
+        <div class="tabs">
+            <button class="tab active" data-tab="portfolio">Portfolio View</button>
+            <button class="tab" data-tab="byCategory">By Category</button>
+            <button class="tab" data-tab="bySector">By Sector</button>
+            <button class="tab" data-tab="charts">📊 Charts</button>
+        </div>
+
+        <!-- Portfolio View -->
+        <div id="portfolioView" class="tab-content active">
+            <div class="portfolio-section">
+                <h2>🔵 Tjark's Stocks</h2>
+                <table class="stock-table" id="tjarkTable">
+                    <thead>
+                        <tr>
+                            <th>WKN/Symbol</th>
+                            <th>Name</th>
+                            <th>Amount</th>
+                            <th>Buy Price</th>
+                            <th>Current Price</th>
+                            <th>Total Value</th>
+                            <th>Gain/Loss</th>
+                            <th>Category</th>
+                            <th>Sector</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="portfolio-section">
+                <h2>🟢 Matthias' Stocks</h2>
+                <table class="stock-table" id="matthiasTable">
+                    <thead>
+                        <tr>
+                            <th>WKN/Symbol</th>
+                            <th>Name</th>
+                            <th>Amount</th>
+                            <th>Buy Price</th>
+                            <th>Current Price</th>
+                            <th>Total Value</th>
+                            <th>Gain/Loss</th>
+                            <th>Category</th>
+                            <th>Sector</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Category View -->
+        <div id="byCategoryView" class="tab-content">
+            <div class="category-section">
+                <h2>📊 Value Stocks</h2>
+                <table class="stock-table" id="valueTable">
+                    <thead>
+                        <tr>
+                            <th>Owner</th>
+                            <th>WKN/Symbol</th>
+                            <th>Name</th>
+                            <th>Amount</th>
+                            <th>Total Value</th>
+                            <th>Gain/Loss</th>
+                            <th>Sector</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="category-section">
+                <h2>🚀 Growth Stocks</h2>
+                <table class="stock-table" id="growthTable">
+                    <thead>
+                        <tr>
+                            <th>Owner</th>
+                            <th>WKN/Symbol</th>
+                            <th>Name</th>
+                            <th>Amount</th>
+                            <th>Total Value</th>
+                            <th>Gain/Loss</th>
+                            <th>Sector</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sector View -->
+        <div id="bySectorView" class="tab-content">
+            <div id="sectorTables"></div>
+        </div>
+
+        <!-- Charts View -->
+        <div id="chartsView" class="tab-content">
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Portfolio Value by Owner</h3>
+                    <canvas id="ownerChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Portfolio Value by Category</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Portfolio Value by Sector</h3>
+                    <canvas id="sectorChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Gain/Loss by Category</h3>
+                    <canvas id="gainLossChart"></canvas>
+                </div>
+                <div class="chart-container full-width">
+                    <h3>Portfolio Performance Over Time</h3>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Tjark's Sector Distribution</h3>
+                    <canvas id="tjarkSectorChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Matthias' Sector Distribution</h3>
+                    <canvas id="matthiasSectorChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Stock Modal -->
+    <div id="stockModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Add New Investment</h2>
+            <form id="stockForm">
+                <input type="hidden" id="stockId">
+                <div class="form-group">
+                    <label for="owner">Owner *</label>
+                    <select id="owner" required>
+                        <option value="tjark">Tjark</option>
+                        <option value="matthias">Matthias</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="wkn">WKN/Symbol *</label>
+                    <input type="text" id="wkn" required placeholder="e.g., A14Y6F">
+                </div>
+                <div class="form-group">
+                    <label for="stockName">Stock Name</label>
+                    <input type="text" id="stockName" placeholder="e.g., Apple Inc.">
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount *</label>
+                    <input type="number" id="amount" required step="0.01" placeholder="e.g., 10">
+                </div>
+                <div class="form-group">
+                    <label for="buyPrice">Buy Price (€) *</label>
+                    <input type="number" id="buyPrice" required step="0.01" placeholder="e.g., 150.50">
+                </div>
+                <div class="form-group">
+                    <label for="currentPrice">Current Price (€)</label>
+                    <input type="number" id="currentPrice" step="0.01" placeholder="Leave empty to fetch">
+                </div>
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" required>
+                        <option value="value">Value</option>
+                        <option value="growth">Growth</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sector">Sector *</label>
+                    <select id="sector" required>
+                        <option value="technology">Technology</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="finance">Finance</option>
+                        <option value="energy">Energy</option>
+                        <option value="consumer">Consumer</option>
+                        <option value="industrial">Industrial</option>
+                        <option value="materials">Materials</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="real-estate">Real Estate</option>
+                        <option value="communications">Communications</option>
+                        <option value="etf">ETF/Index</option>
+                        <option value="crypto">Crypto</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content modal-small">
+            <h2>Confirm Delete</h2>
+            <p>Are you sure you want to delete this stock?</p>
+            <div class="form-actions">
+                <button class="btn btn-danger" id="confirmDelete">Delete</button>
+                <button class="btn btn-secondary" id="cancelDelete">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

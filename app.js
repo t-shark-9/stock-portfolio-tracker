@@ -1,45 +1,53 @@
 // Stock Portfolio Tracker Application
 
-// Polygon API Configuration
-const POLYGON_API_KEY = 'lhTbz8RMQ4dJx_z16yq6IETZQ8_kRsTf';
-const POLYGON_BASE_URL = 'https://api.polygon.io';
+// Yahoo Finance API Configuration (using CORS proxy for browser)
+const YAHOO_PROXY = 'https://corsproxy.io/?';
+const YAHOO_BASE_URL = 'https://query1.finance.yahoo.com/v8/finance/chart/';
 
-// WKN to Ticker mapping (German WKN to US/International tickers)
+// WKN to Yahoo Finance Ticker mapping
+// Format: US stocks = ticker, German stocks = ticker.DE, etc.
 const WKN_TO_TICKER = {
-    'A14Y6F': 'SHOP',      // Shopify
-    'A0YJQ2': 'ISRG',      // Intuitive Surgical
-    'A1KWPQ': 'V',         // Visa
-    'A2T0VU': 'CRWD',      // CrowdStrike
-    'A2AT0H': 'SNAP',      // Snap Inc
-    'A143D6': 'ETSY',      // Etsy
-    'A3DQXS': 'SNOW',      // Snowflake
-    'A3C4QT': 'PLTR',      // Palantir
-    'A3C7R6': 'DDOG',      // Datadog
-    'A12B6J': 'PYPL',      // PayPal
-    '908063': 'NKE',       // Nike
-    'A3EU6F': 'NET',       // Cloudflare
-    'PAG911': 'PAG',       // Penske Automotive
-    '602224': 'HEN3',      // Henkel
-    '871970': 'TUI1',      // TUI
-    'A2JG9Z': 'MELI',      // MercadoLibre
-    'A1H5UP': 'UBER',      // Uber
-    'A0YERL': 'GILD',      // Gilead Sciences
-    'A14WK0': 'ADBE',      // Adobe
-    'A0ETBQ': 'ASML',      // ASML
-    'A2QBX7': 'CPNG',      // Coupang
-    '851399': 'MCD',       // McDonald's
-    '936793': 'JNJ',       // Johnson & Johnson
-    '694482': 'SIE',       // Siemens
-    'A0F5DE': 'KGH.WA',    // KGHM Polska Miedz
-    'DBX1DA': 'SPY',       // S&P 500 ETF
-    'DBX0SV': 'VTI',       // Total Stock Market ETF
-    'A0M4W9': 'EEM',       // Emerging Markets ETF
-    'A2N5NR': 'VWO',       // Vanguard Emerging Markets
-    'A0DLEV': 'IWM',       // Russell 2000 ETF
-    'A4009U': 'RIVN',      // Rivian
-    'A2JNY1': 'NIO',       // NIO
-    'A41FLM': 'IONQ',      // IonQ
-    'A3C47B': 'SOFI',      // SoFi Technologies
+    // Tjark's stocks
+    'A4AFDY': 'BTC-EUR',       // Bitcoin ETP (adjust if different)
+    'PG0Q56': 'BTC-EUR',       // Crypto (adjust if different)
+    'GJ860K': null,            // Derivative/Warrant - manual only
+    'GV3XWF': null,            // Derivative/Warrant - manual only
+    'A14Y6F': 'SHOP',          // Shopify
+    'A0YJQ2': 'ISRG',          // Intuitive Surgical
+    'A1KWPQ': 'V',             // Visa
+    'A2T0VU': 'CRWD',          // CrowdStrike
+    'A2AT0H': 'SNAP',          // Snap Inc
+    '871970': 'TUI1.DE',       // TUI AG (German)
+    'A143D6': 'ETSY',          // Etsy
+    'A3DQXS': 'SNOW',          // Snowflake
+    'A3C4QT': 'PLTR',          // Palantir
+    '602224': 'HEN3.DE',       // Henkel (German)
+    'A3C7R6': 'DDOG',          // Datadog
+    'A12B6J': 'PYPL',          // PayPal
+    '908063': 'NKE',           // Nike
+    'A41FLM': 'IONQ',          // IonQ
+    'A3EU6F': 'NET',           // Cloudflare
+    'PAG911': 'PAG',           // Penske Automotive
+    'A3C47B': 'SOFI',          // SoFi Technologies
+    
+    // Matthias's stocks
+    'A0F5DE': 'KGH.WA',        // KGHM Polska Miedz (Warsaw)
+    'A2JG9Z': 'MELI',          // MercadoLibre
+    'A0M4W9': 'EEM',           // iShares Emerging Markets ETF
+    '694482': 'SIE.DE',        // Siemens (German)
+    '851399': 'MCD',           // McDonald's
+    '936793': 'JNJ',           // Johnson & Johnson
+    'A1H5UP': 'UBER',          // Uber
+    'A0YERL': 'GILD',          // Gilead Sciences
+    'A14WK0': 'ADBE',          // Adobe
+    'A0ETBQ': 'ASML',          // ASML
+    'A2N5NR': 'VWO',           // Vanguard Emerging Markets ETF
+    'A0DLEV': 'IWM',           // iShares Russell 2000 ETF
+    'A4009U': 'RIVN',          // Rivian
+    'A2JNY1': 'NIO',           // NIO
+    'A2QBX7': 'CPNG',          // Coupang
+    'DBX1DA': 'XDWD.DE',       // Xtrackers MSCI World (German ETF)
+    'DBX0SV': 'XDWL.DE',       // Xtrackers MSCI World (German ETF)
 };
 
 // Initial data from the CSV (pre-populated)
@@ -191,20 +199,51 @@ function recordPriceSnapshot() {
     savePriceHistory();
 }
 
-// Fetch stock price from Polygon API
+// Fetch stock price from Yahoo Finance API
 async function fetchStockPrice(ticker) {
     try {
-        const response = await fetch(
-            `${POLYGON_BASE_URL}/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
-        );
+        // Use a CORS proxy to access Yahoo Finance
+        const url = `${YAHOO_PROXY}${encodeURIComponent(YAHOO_BASE_URL + ticker + '?interval=1d&range=1d')}`;
+        const response = await fetch(url);
         const data = await response.json();
         
-        if (data.results && data.results.length > 0) {
-            return data.results[0].c; // closing price
+        if (data.chart && data.chart.result && data.chart.result[0]) {
+            const result = data.chart.result[0];
+            const meta = result.meta;
+            // Get the regular market price
+            if (meta.regularMarketPrice) {
+                return meta.regularMarketPrice;
+            }
+            // Fallback to previous close
+            if (meta.previousClose) {
+                return meta.previousClose;
+            }
         }
         return null;
     } catch (error) {
         console.error(`Error fetching price for ${ticker}:`, error);
+        return null;
+    }
+}
+
+// Fetch stock info (name) from Yahoo Finance
+async function fetchStockInfo(ticker) {
+    try {
+        const url = `${YAHOO_PROXY}${encodeURIComponent(YAHOO_BASE_URL + ticker + '?interval=1d&range=1d')}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.chart && data.chart.result && data.chart.result[0]) {
+            const meta = data.chart.result[0].meta;
+            return {
+                name: meta.shortName || meta.longName || ticker,
+                price: meta.regularMarketPrice || meta.previousClose,
+                currency: meta.currency
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching info for ${ticker}:`, error);
         return null;
     }
 }
@@ -222,15 +261,21 @@ async function fetchAllPrices() {
         const ticker = WKN_TO_TICKER[stock.wkn.toUpperCase()];
         if (ticker) {
             try {
-                const price = await fetchStockPrice(ticker);
-                if (price !== null) {
-                    stock.currentPrice = price;
+                const info = await fetchStockInfo(ticker);
+                if (info && info.price !== null) {
+                    stock.currentPrice = info.price;
+                    // Update name if empty
+                    if (!stock.name && info.name) {
+                        stock.name = info.name;
+                    }
                     updatedCount++;
                 }
             } catch (error) {
                 errorCount++;
+                console.error(`Failed to fetch ${ticker}:`, error);
             }
-            await new Promise(resolve => setTimeout(resolve, 150));
+            // Delay between requests to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 300));
         }
     }
     
